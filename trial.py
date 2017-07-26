@@ -1,12 +1,9 @@
-%load_ext autoreload
-
-%autoreload 2
-
 from Edge import Edge
-
 from Vertex import Vertex
-
 from Automat import Automaton
+
+"""Testing example.
+"""
 
 cvor0 = Vertex(0, True)
 cvor1 = Vertex(1, False, True)

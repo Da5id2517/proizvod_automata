@@ -1,5 +1,3 @@
-from Automat import Automaton
-
 def represent(automat, output_file):
     try:
         output_file = open(output_file, "w")
@@ -51,6 +49,3 @@ def represent(automat, output_file):
     output += "\end{document}\n"
     output_file.write(output)
     output_file.close()
-
-
-# use join not plus!
