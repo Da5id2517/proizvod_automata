@@ -1,2 +1,8 @@
+# LATEX
 *.tex
+
+# pyc
 *.pyc
+
+# example
+example.py
