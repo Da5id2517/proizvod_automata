@@ -1,3 +1,6 @@
+from Vertex import initial
+
+
 def represent(automat, output_file):
     try:
         output_file = open(output_file, "w")
@@ -9,9 +12,9 @@ def represent(automat, output_file):
     output += "\n\\begin{document}\n"
     output += "\\begin{tikzpicture} [>=stealth',shorten >=1pt,auto,node distance=3.2cm]\n"
 
-    k = automat.get_initial()
+    k = automat.fetch(initial)
     output += "\\node[initial, "
-    if k.get_final():
+    if k.final:
         output += r"accepting, "
     output += "state] (_"
     output += str(k)
@@ -19,12 +22,12 @@ def represent(automat, output_file):
     output += str(k)
     output += "$}; \n"
 
-    for v in automat.get_vertices():
+    for v in automat.vertices:
         if v == k:
             tmp = k
             continue
         output += "\\node[state"
-        if v.get_final():
+        if v.final:
             output += ", accepting"
         output += "] (_"
         output += str(v)
@@ -35,15 +38,15 @@ def represent(automat, output_file):
         output += "$}; \n"
         tmp = v
     output += "\\path[->]"
-    for e in automat.get_edges():
-        if e.get_start() == e.get_end():
-            output += "(_" + str(e.get_start()) + ")"
-            output += "edge [loop above] node {" + e.get_letter() + "}"
-            output += "(_" + str(e.get_start()) + ")\n"
+    for e in automat.edges:
+        if e.start == e.end:
+            output += "(_" + str(e.start) + ")"
+            output += "edge [loop above] node {" + e.letter + "}"
+            output += "(_" + str(e.start) + ")\n"
             continue
-        output += "(_" + str(e.get_start()) + ")"
-        output += "edge [bend right] node {" + e.get_letter() + "}"
-        output += "(_" + str(e.get_end()) + ")\n"
+        output += "(_" + str(e.start) + ")"
+        output += "edge [bend right] node {" + e.letter + "}"
+        output += "(_" + str(e.end) + ")\n"
     output += ";\n"
     output += "\end{tikzpicture}\n"
     output += "\end{document}\n"

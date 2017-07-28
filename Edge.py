@@ -17,4 +17,4 @@ class Edge:
         return self._letter
 
     def __str__(self):
-        return "{:s} -> {:s} -> {:s}".format(self.start, self.letter, self.end)
+        return "{self.start} -> {self.letter} -> {self.end}".format(self=self)
