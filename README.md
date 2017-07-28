@@ -1,1 +1,1 @@
-Presek dva regularna jezika preko proizvoda automata. Funkcija represent generise latex kod, dok se u trial.py nalaze test primeri. Reprezentacija automata sa cvorovima ciji su identifikatori liste jos nije implementirano.
+Presek dva regularna jezika preko proizvoda automata.
