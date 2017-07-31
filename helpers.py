@@ -1,6 +1,7 @@
 from Vertex import initial
 
 
+# TODO: this is horrible, fix this.
 def represent(automat, output_file):
     try:
         output_file = open(output_file, "w")

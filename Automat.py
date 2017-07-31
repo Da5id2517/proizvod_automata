@@ -1,3 +1,5 @@
+import sys
+
 from Vertex import Vertex, initial, final
 from Edge import Edge
 
@@ -8,6 +10,10 @@ class Automaton:
         self._edges = edges
         self._alphabet = alphabet
         self.complete()
+        # TODO: I have no idea why the clean_up isn't working proper
+        # in the meantime handled like this...
+        for i in xrange(len(self.alphabet)+1):
+            self.clean_up()
 
     @property
     def alphabet(self):
@@ -33,6 +39,8 @@ class Automaton:
                 return vertex
 
     def transition_by_letter(self, current_vertex, letter):
+        if letter not in self.alphabet:
+            return self.error
         for edge in self.edges:
             if edge.start == current_vertex and edge.letter == letter:
                 return edge.end if edge.end in self.vertices else self.error
@@ -43,33 +51,43 @@ class Automaton:
         current_vertex = self.fetch(initial)
         for letter in word:
             current_vertex = self.transition_by_letter(current_vertex, letter)
-        return current_vertex.final
+        return current_vertex.final if current_vertex is not None\
+            else False
 
     # NOTE: you complete the automaton upon creation.
     def complete(self):
         error_state = Vertex("Error", initial=False, final=False)
+        self.vertices.append(error_state)
         for vertex in self.vertices:
             for letter in self.alphabet:
-                if self.transition_by_letter(vertex, letter) is None:
-                    self.edges.append(Edge(vertex, error_state, letter))
+                if vertex.name != "Error":
+                    if self.transition_by_letter(vertex, letter) is None:
+                        self.edges.append(Edge(vertex, error_state, letter))
 
-    # TODO: Read theory before rewriting this.
-    # def multiply_automaton(self, other_automaton):
-    #     if set(self._alphabet) != set(other_automaton.get_alphabet()):
-    #         raise Exception("Alphabets of automatons must match!")
-    #     all_states = set([])
-    #     all_edges = set([])
-    #     self.complete()
-    #     other_automaton.complete()
-    #     for k in self._vertices:
-    #         for j in other_automaton.get_vertices():
-    #             for letter in self._alphabet:
-    #                 new1 = k.descartes_product(j)
-    #                 new2 = self.
-    #   transition_by_letter(k, letter).descartes_product(
-    #                   other_automaton.transition_by_letter(j, letter))
-    #                 new_e = Edge(new1, new2, letter)
-    #                 all_edges.add(new_e)
-    #                 all_states.add(new1)
-    #                 all_states.add(new2)
-    #     return Automaton(all_states, all_edges, self._alphabet)
+    def clean_up(self):
+        for edge in self.edges:
+            if edge.start.name == "Error":
+                self.edges.remove(edge)
+
+    def multiply_automaton(self, other):
+        if self.alphabet != other.alphabet:
+            print("Alphabets must match!\n")
+            sys.exit(0)
+        vertices = set()
+        edges = set()
+        for vertex_1 in self.vertices:
+            for vertex_2 in other.vertices:
+                for letter in self.alphabet:
+
+                    new_vertex_1 = vertex_1.descartes_product(vertex_2)
+                    new_vertex_2 = self.transition_by_letter(
+                        vertex_1, letter).descartes_product(
+                        other.transition_by_letter(vertex_2, letter)
+                    )
+                    new_edge = Edge(new_vertex_1, new_vertex_2, letter)
+
+                    edges.add(new_edge)
+                    vertices.add(new_vertex_1)
+                    vertices.add(new_vertex_2)
+
+        return Automaton(list(vertices), list(edges), self.alphabet)

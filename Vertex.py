@@ -34,10 +34,15 @@ class Vertex:
                     close=")" if self.final else "",
                     initial="->" if self.initial else "")
 
+    def __hash__(self):
+        return self.name.__hash__()
+
     def __eq__(self, other):
         return self.name == other.name \
                and self.initial == other.initial \
                and self.final == other.final
+
+    # TODO: figure out how to hash this shit...
 
 
 def initial(vertex):
