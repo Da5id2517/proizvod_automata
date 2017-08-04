@@ -1,4 +1,7 @@
 class Vertex:
+
+    _error_hash = "Error".__hash__()
+
     def __init__(self, name="", initial=False, final=False):
         self._name = name
         self._initial = initial
@@ -15,6 +18,9 @@ class Vertex:
     @property
     def final(self):
         return self._final
+
+    def represent(self):
+        pass
 
     # TODO: the & should be dynamic depending on the set operation.
     # TODO: read theory to determine which is which.
@@ -35,14 +41,14 @@ class Vertex:
                     initial="->" if self.initial else "")
 
     def __hash__(self):
+        if self.name == "Error":
+            return self._error_hash
         return self.name.__hash__()
 
     def __eq__(self, other):
         return self.name == other.name \
                and self.initial == other.initial \
                and self.final == other.final
-
-    # TODO: figure out how to hash this shit...
 
 
 def initial(vertex):

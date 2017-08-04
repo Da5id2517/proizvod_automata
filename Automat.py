@@ -1,6 +1,6 @@
 import sys
 
-from Vertex import Vertex, initial, final
+from Vertex import Vertex, initial
 from Edge import Edge
 
 
@@ -10,10 +10,7 @@ class Automaton:
         self._edges = edges
         self._alphabet = alphabet
         self.complete()
-        # TODO: I have no idea why the clean_up isn't working proper
-        # in the meantime handled like this...
-        for i in xrange(len(self.alphabet)+1):
-            self.clean_up()
+        self.clean_up()
 
     @property
     def alphabet(self):
@@ -38,13 +35,17 @@ class Automaton:
             if mod(vertex):
                 return vertex
 
+    def represent(self):
+        pass
+
     def transition_by_letter(self, current_vertex, letter):
         if letter not in self.alphabet:
             return self.error
+
         for edge in self.edges:
             if edge.start == current_vertex and edge.letter == letter:
                 return edge.end if edge.end in self.vertices else self.error
-            # TODO: change this to the appropriate error state.
+
         return self.error
 
     def accepts_word(self, word):

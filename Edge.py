@@ -16,5 +16,17 @@ class Edge:
     def letter(self):
         return self._letter
 
+    def represent(self):
+        pass
+
     def __str__(self):
         return "{self.start} -> {self.letter} -> {self.end}".format(self=self)
+
+    def __hash__(self):
+        return self.start.__hash__() \
+               + self.end.__hash__() \
+               + self.letter.__hash__()
+
+    def __eq__(self, other):
+        return self.start == other.start and self.end == other.end \
+            and self.letter == other.letter
