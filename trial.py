@@ -1,3 +1,4 @@
+import operator
 from Edge import Edge
 from Vertex import Vertex
 from Automat import Automaton
@@ -12,12 +13,15 @@ cvor3 = Vertex("3", False, True)
 
 e1 = Edge(cvor0, cvor0, "a")
 e2 = Edge(cvor0, cvor1, "b")
-e3 = Edge(cvor2, cvor3, "a")
-e4 = Edge(cvor3, cvor3, "b")
+e3 = Edge(cvor2, cvor2, "a")
+e4 = Edge(cvor2, cvor3, "b")
 
-prvi = Automaton([cvor0, cvor1], [e1, e2], "ab")
-drugi = Automaton([cvor3, cvor2], [e3, e4], "ab")
-proizvod = prvi.multiply_automaton(drugi)
+# print(product_type(cvor0, cvor2, operator.__and__))
+
+prvi = Automaton({cvor0, cvor1}, {e1, e2}, "ab")
+drugi = Automaton({cvor3, cvor2}, {e3, e4}, "ab")
+proizvod = prvi.multiply_automaton(drugi, operator.__and__)
 print(proizvod.accepts_word("ab"))
 for edge in proizvod.edges:
     print(edge)
+print("--------------------------------")

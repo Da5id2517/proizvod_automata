@@ -5,7 +5,7 @@ from Edge import Edge
 
 
 class Automaton:
-    def __init__(self, vertices=[], edges=[], alphabet=""):
+    def __init__(self, vertices=set(), edges=set(), alphabet=set("")):
         self._vertices = vertices
         self._edges = edges
         self._alphabet = alphabet
@@ -23,7 +23,7 @@ class Automaton:
     @property
     def error(self):
         for vertex in self.vertices:
-            if vertex.name == "Error":
+            if vertex.error:
                 return vertex
 
     @property
@@ -34,6 +34,8 @@ class Automaton:
         for vertex in self.vertices:
             if mod(vertex):
                 return vertex
+            else:
+                return self.error
 
     def represent(self):
         pass
@@ -57,20 +59,21 @@ class Automaton:
 
     # NOTE: you complete the automaton upon creation.
     def complete(self):
-        error_state = Vertex("Error", initial=False, final=False)
-        self.vertices.append(error_state)
+        error_state = Vertex("Error", initial=False, final=False, error=True)
+        self.vertices.add(error_state)
         for vertex in self.vertices:
             for letter in self.alphabet:
-                if vertex.name != "Error":
-                    if self.transition_by_letter(vertex, letter) is None:
-                        self.edges.append(Edge(vertex, error_state, letter))
+                if vertex.error:
+                    if self.transition_by_letter(vertex, letter) == self.error:
+                        self.edges.add(Edge(vertex, error_state, letter))
 
     def clean_up(self):
-        for edge in self.edges:
-            if edge.start.name == "Error":
+        for edge in self.edges.copy():
+            if edge.start.error:
                 self.edges.remove(edge)
 
-    def multiply_automaton(self, other):
+    def multiply_automaton(self, other, operator):
+        # Nice error handling...
         if self.alphabet != other.alphabet:
             print("Alphabets must match!\n")
             sys.exit(0)
@@ -80,15 +83,16 @@ class Automaton:
             for vertex_2 in other.vertices:
                 for letter in self.alphabet:
 
-                    new_vertex_1 = vertex_1.descartes_product(vertex_2)
+                    new_vertex_1 = vertex_1.descartes_product(vertex_2,
+                                                              operator)
                     new_vertex_2 = self.transition_by_letter(
                         vertex_1, letter).descartes_product(
-                        other.transition_by_letter(vertex_2, letter)
-                    )
+                        other.transition_by_letter(vertex_2, letter), operator)
+
                     new_edge = Edge(new_vertex_1, new_vertex_2, letter)
 
                     edges.add(new_edge)
                     vertices.add(new_vertex_1)
                     vertices.add(new_vertex_2)
 
-        return Automaton(list(vertices), list(edges), self.alphabet)
+        return Automaton(vertices, edges, self.alphabet)

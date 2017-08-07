@@ -1,5 +1,5 @@
 class Edge:
-    def __init__(self, start, end, letter=" "):
+    def __init__(self, start, end, letter=""):
         self._start = start
         self._end = end
         self._letter = letter
@@ -19,7 +19,8 @@ class Edge:
     def represent(self):
         pass
 
-    def __str__(self):
+    # We are beside ourselves.
+    def __repr__(self):
         return "{self.start} -> {self.letter} -> {self.end}".format(self=self)
 
     def __hash__(self):
@@ -28,5 +29,6 @@ class Edge:
                + self.letter.__hash__()
 
     def __eq__(self, other):
-        return self.start == other.start and self.end == other.end \
-            and self.letter == other.letter
+        return self.start == other.start \
+               and self.end == other.end \
+               and self.letter == other.letter
