@@ -1,4 +1,5 @@
 import sys
+import operator
 
 from Vertex import Vertex, initial
 from Edge import Edge
@@ -54,7 +55,7 @@ class Automaton:
         current_vertex = self.fetch(initial)
         for letter in word:
             current_vertex = self.transition_by_letter(current_vertex, letter)
-        return current_vertex.final if current_vertex is not None\
+        return current_vertex.final if not current_vertex.error\
             else False
 
     # NOTE: you complete the automaton upon creation.
@@ -96,3 +97,9 @@ class Automaton:
                     vertices.add(new_vertex_2)
 
         return Automaton(vertices, edges, self.alphabet)
+
+    def __and__(self, other):
+        return self.multiply_automaton(other, operator.__and__)
+
+    def __or__(self, other):
+        return self.multiply_automaton(other, operator.__or__)

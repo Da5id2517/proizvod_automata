@@ -1,4 +1,3 @@
-# TODO: add a third bool error?
 class Vertex:
 
     _error_hash = "Error".__hash__()
@@ -40,7 +39,7 @@ class Vertex:
                     initial="->" if self.initial else "")
 
     def __hash__(self):
-        if self.name == "Error":
+        if self.error:
             return self._error_hash
         else:
             return self.name.__hash__()
@@ -52,22 +51,21 @@ class Vertex:
 
     def __and__(self, other):
         # TODO: figure the error state handling out!
-        if self.error:
-            return self
-        if other.error:
-            return other
+        if self.error and other.error:
+            return self if self.error else other
         return Vertex(self.name + other.name,
                       self.initial & other.initial,
                       self.final & other.final)
 
+    # TODO: read up on theory to handle this proper.
     def __or__(self, other):
-        if self.error and other.error:
-            return Vertex(
-                "" if self.error else self.name +
-                "" if other.error else other.name,
-                self.initial | other.initial,
-                self.final | other.final)
-        return self if self.error else other
+        if self.error or other.error:
+            return self if self.error else other
+        return Vertex(
+            "" if self.error else self.name +
+            "" if other.error else other.name,
+            self.initial | other.initial,
+            self.final | other.final)
 
 
 def initial(vertex):
