@@ -24,7 +24,7 @@ class Automaton:
     @property
     def error(self):
         for vertex in self.vertices:
-            if vertex.name == "Error":
+            if vertex.error:
                 return vertex
 
     @property
@@ -42,8 +42,14 @@ class Automaton:
         pass
 
     def transition_by_letter(self, current_vertex, letter):
+        if len(letter) != 1:
+            raise ValueError("The letter argument must be a character.")
+
         if letter not in self.alphabet:
             return self.error
+
+        if current_vertex.error:
+            return current_vertex
 
         for edge in self.edges:
             if edge.start == current_vertex and edge.letter == letter:
@@ -55,22 +61,22 @@ class Automaton:
         current_vertex = self.fetch(initial)
         for letter in word:
             current_vertex = self.transition_by_letter(current_vertex, letter)
-        return current_vertex.final if not current_vertex.name == "Error"\
+        return current_vertex.final if not current_vertex.error\
             else False
 
     # NOTE: you complete the automaton upon creation.
     def complete(self):
-        error_state = Vertex("Error", initial=False, final=False)
+        error_state = Vertex(initial=False, final=False, error=True)
         self.vertices.add(error_state)
         for vertex in self.vertices:
             for letter in self.alphabet:
-                if vertex.name == "Error":
+                if vertex.error:
                     if self.transition_by_letter(vertex, letter) == self.error:
                         self.edges.add(Edge(vertex, error_state, letter))
 
     def clean_up(self):
         for edge in self.edges.copy():
-            if edge.start.name == "Error":
+            if edge.start.error:
                 self.edges.remove(edge)
 
     def multiply_automaton(self, other, operator):

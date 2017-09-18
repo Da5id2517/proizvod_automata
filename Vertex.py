@@ -2,10 +2,14 @@ class Vertex:
 
     _error_hash = "Error".__hash__()
 
-    def __init__(self, name="", initial=False, final=False):
-        self._name = name
+    def __init__(self, name="", initial=False, final=False, error=False):
+        if error:
+            self._name = "Error"
+        else:
+            self._name = name
         self._initial = initial
         self._final = final
+        self._error = error
 
     @property
     def name(self):
@@ -18,6 +22,10 @@ class Vertex:
     @property
     def final(self):
         return self._final
+
+    @property
+    def error(self):
+        return self._error
 
     def represent(self):
         pass
@@ -34,7 +42,7 @@ class Vertex:
                     initial="->" if self.initial else "")
 
     def __hash__(self):
-        if self.name == "Error":
+        if self.error:
             return self._error_hash
         else:
             return self.name.__hash__()
@@ -42,24 +50,19 @@ class Vertex:
     def __eq__(self, other):
         return self.name == other.name \
                and self.initial == other.initial \
-               and self.final == other.final
+               and self.final == other.final \
+               and self.error == other.error
 
     def __and__(self, other):
-        if self.name == "Error":
-            return self
-        if other.name == "Error":
-            return other
+        if self.error or other.error:
+            return self if self.error else other
         return Vertex(self.name + other.name,
                       self.initial & other.initial,
                       self.final & other.final)
 
-    # TODO: read up on theory to handle this proper.
     def __or__(self, other):
-        # TODO: error state needs to be different here.
-        if self.name == "Error":
+        if self.error and other.error:
             return self
-        if other.name == "Error":
-            return other
         return Vertex(
             self.name + other.name,
             self.initial | other.initial,

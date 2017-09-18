@@ -3,6 +3,7 @@
 
 # pyc
 *.pyc
+.python-version
 
 # example
 example.py

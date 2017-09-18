@@ -1,8 +1,14 @@
+from Vertex import Vertex
+
+
 class Edge:
     def __init__(self, start, end, letter=""):
-        self._start = start
-        self._end = end
-        self._letter = letter
+        if isinstance(start, Vertex) and isinstance(end, Vertex):
+            self._start = start
+            self._end = end
+            self._letter = letter
+        else:
+            raise ValueError("Start and end must be of type Vertex.")
 
     @property
     def start(self):
