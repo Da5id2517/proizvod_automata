@@ -1,4 +1,3 @@
-import sys
 import operator
 
 from Vertex import Vertex, initial
@@ -7,10 +6,10 @@ from Edge import Edge
 
 class Automaton:
     def __init__(self, vertices=set(), edges=set(), alphabet=set("")):
+        vertices.add(Vertex(initial=False, final=False, error=True))
         self._vertices = vertices
         self._edges = edges
         self._alphabet = alphabet
-        self.complete()
         self.clean_up()
 
     @property
@@ -53,26 +52,18 @@ class Automaton:
 
         for edge in self.edges:
             if edge.start == current_vertex and edge.letter == letter:
-                return edge.end if edge.end in self.vertices else self.error
+                return edge.end
 
         return self.error
 
     def accepts_word(self, word):
         current_vertex = self.fetch(initial)
         for letter in word:
-            current_vertex = self.transition_by_letter(current_vertex, letter)
-        return current_vertex.final if not current_vertex.error\
-            else False
-
-    # NOTE: you complete the automaton upon creation.
-    def complete(self):
-        error_state = Vertex(initial=False, final=False, error=True)
-        self.vertices.add(error_state)
-        for vertex in self.vertices:
-            for letter in self.alphabet:
-                if vertex.error:
-                    if self.transition_by_letter(vertex, letter) == self.error:
-                        self.edges.add(Edge(vertex, error_state, letter))
+            current_vertex, previous_vertex = self.transition_by_letter(
+                current_vertex, letter)
+        if current_vertex.error:
+            return False
+        return current_vertex.final
 
     def clean_up(self):
         for edge in self.edges.copy():
@@ -80,18 +71,18 @@ class Automaton:
                 self.edges.remove(edge)
 
     def multiply_automaton(self, other, operator):
-        # Nice error handling...
         if self.alphabet != other.alphabet:
-            print("Alphabets must match!\n")
-            sys.exit(0)
+            raise ValueError("Alphabets must match!")
         vertices = set()
         edges = set()
         for vertex_1 in self.vertices:
             for vertex_2 in other.vertices:
                 for letter in self.alphabet:
 
-                    new_vertex_1 = vertex_1.descartes_product(vertex_2,
-                                                              operator)
+                    new_vertex_1 = vertex_1.descartes_product(
+                        vertex_2,
+                        operator)
+                    # TODO: figure how to make this vertex proper.
                     new_vertex_2 = self.transition_by_letter(
                         vertex_1, letter).descartes_product(
                         other.transition_by_letter(vertex_2, letter), operator)

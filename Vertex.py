@@ -3,13 +3,16 @@ class Vertex:
     _error_hash = "Error".__hash__()
 
     def __init__(self, name="", initial=False, final=False, error=False):
+        self._error = error
         if error:
             self._name = "Error"
+            self._initial = False
+            self._final = False
+            return
         else:
             self._name = name
         self._initial = initial
         self._final = final
-        self._error = error
 
     @property
     def name(self):
@@ -54,19 +57,18 @@ class Vertex:
                and self.error == other.error
 
     def __and__(self, other):
-        if self.error or other.error:
-            return self if self.error else other
-        return Vertex(self.name + other.name,
-                      self.initial & other.initial,
-                      self.final & other.final)
+        return Vertex(
+            name=self.name + other.name,
+            initial=self.initial & other.initial,
+            final=self.final & other.final,
+            error=self.error | other.error)
 
     def __or__(self, other):
-        if self.error and other.error:
-            return self
         return Vertex(
-            self.name + other.name,
-            self.initial | other.initial,
-            self.final | other.final)
+            name=self.name + other.name,
+            initial=self.initial | other.initial,
+            final=self.final | other.final,
+            error=self.error & other.error)
 
 
 def initial(vertex):
