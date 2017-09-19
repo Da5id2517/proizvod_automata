@@ -59,7 +59,7 @@ class Automaton:
     def accepts_word(self, word):
         current_vertex = self.fetch(initial)
         for letter in word:
-            current_vertex, previous_vertex = self.transition_by_letter(
+            current_vertex = self.transition_by_letter(
                 current_vertex, letter)
         if current_vertex.error:
             return False
@@ -67,7 +67,7 @@ class Automaton:
 
     def clean_up(self):
         for edge in self.edges.copy():
-            if edge.start.error:
+            if edge.start.error or edge.end.error:
                 self.edges.remove(edge)
 
     def multiply_automaton(self, other, operator):
