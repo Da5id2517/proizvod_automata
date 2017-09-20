@@ -1,4 +1,5 @@
 import pytest
+
 from Automat import Automaton
 from Edge import Edge
 from Vertex import Vertex, initial, final, error

@@ -1,4 +1,5 @@
 import operator
+from re import compile, search
 
 from Vertex import Vertex, initial
 from Edge import Edge
@@ -44,11 +45,8 @@ class Automaton:
         if len(letter) != 1:
             raise ValueError("The letter argument must be a character.")
 
-        if letter not in self.alphabet:
+        if letter not in self.alphabet or current_vertex.error:
             return self.error
-
-        if current_vertex.error:
-            return current_vertex
 
         for edge in self.edges:
             if edge.start == current_vertex and edge.letter == letter:
@@ -75,17 +73,35 @@ class Automaton:
             raise ValueError("Alphabets must match!")
         vertices = set()
         edges = set()
-        for vertex_1 in self.vertices:
-            for vertex_2 in other.vertices:
+        error_pattern_right = compile("\dError")
+        error_pattern_left = compile("Error\d")
+        # TODO: Rewrite in helpers.py
+        vertices_first = self.vertices.copy()
+        vertices_second = other.vertices.copy()
+        vertices_first.remove(self.error)
+        vertices_second.remove(other.error)
+        for vertex_1 in vertices_first:
+            for vertex_2 in vertices_second:
                 for letter in self.alphabet:
 
                     new_vertex_1 = vertex_1.descartes_product(
-                        vertex_2,
-                        operator)
-                    # TODO: figure how to make this vertex proper.
+                        vertex_2, operator)
+
                     new_vertex_2 = self.transition_by_letter(
                         vertex_1, letter).descartes_product(
                         other.transition_by_letter(vertex_2, letter), operator)
+
+                    # TODO: Rewrite this in helpers.py
+                    if operator(False, True):
+                        if search(error_pattern_left, new_vertex_2.name):
+                            new_vertex_2 = vertex_1.descartes_product(
+                                other.transition_by_letter(vertex_2, letter),
+                                operator)
+
+                        if search(error_pattern_right, new_vertex_2.name):
+                            new_vertex_2 = self.transition_by_letter(
+                                vertex_1, letter
+                            ).descartes_product(vertex_2, operator)
 
                     new_edge = Edge(new_vertex_1, new_vertex_2, letter)
 
@@ -100,3 +116,7 @@ class Automaton:
 
     def __or__(self, other):
         return self.multiply_automaton(other, operator.__or__)
+
+    # TODO: add subtraction to product.
+    def __sub__(self, other):
+        pass

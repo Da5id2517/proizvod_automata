@@ -1,4 +1,5 @@
 import pytest
+
 from Edge import Edge
 
 

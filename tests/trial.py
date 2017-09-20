@@ -17,8 +17,8 @@ e4 = Edge(cvor2, cvor3, "b")
 
 prvi = Automaton({cvor0, cvor1}, {e1, e2}, "ab")
 drugi = Automaton({cvor3, cvor2}, {e3, e4}, "ab")
-proizvod = prvi & drugi
-print(proizvod.accepts_word("aaaaaaab"))
+proizvod = prvi | drugi
+print(proizvod.accepts_word("ab"))
 for edge in proizvod.edges:
     print(edge)
 print("--------------------------------")

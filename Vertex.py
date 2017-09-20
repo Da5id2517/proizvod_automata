@@ -33,7 +33,6 @@ class Vertex:
     def represent(self):
         pass
 
-    # TODO: overload operators for vertex!
     def descartes_product(self, other, operator):
         return operator(self, other)
 
@@ -70,7 +69,12 @@ class Vertex:
             final=self.final | other.final,
             error=self.error & other.error)
 
+    # TODO: add subtraction to vertex
+    def __sub__(self, other):
+        pass
 
+
+# Used in testing.
 def initial(vertex):
     return vertex.initial
 
