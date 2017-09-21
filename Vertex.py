@@ -33,9 +33,6 @@ class Vertex:
     def represent(self):
         pass
 
-    def descartes_product(self, other, operator):
-        return operator(self, other)
-
     def __repr__(self):
         return "{initial}{open}{self.name}{close}"\
             .format(self=self,

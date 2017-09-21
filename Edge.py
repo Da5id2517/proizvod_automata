@@ -27,7 +27,7 @@ class Edge:
 
     # We are beside ourselves.
     def __repr__(self):
-        return "{self.start} -> {self.letter} -> {self.end}".format(self=self)
+        return "{self.start} --> {self.letter} --> {self.end}".format(self=self)
 
     def __hash__(self):
         return self.start.__hash__() \

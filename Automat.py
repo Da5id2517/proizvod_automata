@@ -31,6 +31,12 @@ class Automaton:
     def edges(self):
         return self._edges
 
+    # Should this be private?
+    def _remove_error(self):
+        vertices = self.vertices.copy()
+        vertices.remove(self.error)
+        return vertices
+
     def fetch(self, mod):
         for vertex in self.vertices:
             if mod(vertex):
@@ -75,33 +81,25 @@ class Automaton:
         edges = set()
         error_pattern_right = compile("\dError")
         error_pattern_left = compile("Error\d")
-        # TODO: Rewrite in helpers.py
-        vertices_first = self.vertices.copy()
-        vertices_second = other.vertices.copy()
-        vertices_first.remove(self.error)
-        vertices_second.remove(other.error)
-        for vertex_1 in vertices_first:
-            for vertex_2 in vertices_second:
+        for vertex_1 in self._remove_error():
+            for vertex_2 in other._remove_error():
                 for letter in self.alphabet:
-
-                    new_vertex_1 = vertex_1.descartes_product(
-                        vertex_2, operator)
-
-                    new_vertex_2 = self.transition_by_letter(
-                        vertex_1, letter).descartes_product(
-                        other.transition_by_letter(vertex_2, letter), operator)
+                    new_vertex_1 = operator(vertex_1, vertex_2)
+                    new_vertex_2 = operator(self.transition_by_letter(
+                        vertex_1, letter),
+                        other.transition_by_letter(vertex_2, letter))
 
                     # TODO: Rewrite this in helpers.py
                     if operator(False, True):
                         if search(error_pattern_left, new_vertex_2.name):
-                            new_vertex_2 = vertex_1.descartes_product(
-                                other.transition_by_letter(vertex_2, letter),
-                                operator)
+                            new_vertex_2 = operator(
+                                vertex_1,
+                                other.transition_by_letter(vertex_2, letter))
 
                         if search(error_pattern_right, new_vertex_2.name):
-                            new_vertex_2 = self.transition_by_letter(
-                                vertex_1, letter
-                            ).descartes_product(vertex_2, operator)
+                            new_vertex_2 = operator(
+                                self.transition_by_letter(vertex_1, letter),
+                                vertex_2)
 
                     new_edge = Edge(new_vertex_1, new_vertex_2, letter)
 
