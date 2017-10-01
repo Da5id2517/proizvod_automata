@@ -30,8 +30,15 @@ class Vertex:
     def error(self):
         return self._error
 
-    def represent(self):
-        pass
+    def represent(self, position=""):
+        return "\\node[state{initial}{accepting}] ({name}) at ({position}) " \
+               "{name1};\n"\
+            .format(
+                initial=",initial" if self.initial else "",
+                accepting=",accepting" if self.final else "",
+                name=self.name,
+                name1="{$" + self.name + "$}",
+                position=position)
 
     def __repr__(self):
         return "{initial}{open}{self.name}{close}"\

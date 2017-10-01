@@ -1,5 +1,6 @@
 import operator
 from re import compile, search
+from math import log
 
 from Vertex import Vertex, initial
 from Edge import Edge
@@ -31,21 +32,37 @@ class Automaton:
     def edges(self):
         return self._edges
 
-    # Should this be private?
-    def _remove_error(self):
+    def _remove_vertex(self, vertex):
         vertices = self.vertices.copy()
-        vertices.remove(self.error)
+        if isinstance(vertex, list):
+            for v in vertex:
+                vertices.remove(v)
+            return vertices
+        vertices.remove(vertex)
         return vertices
 
     def fetch(self, mod):
         for vertex in self.vertices:
             if mod(vertex):
                 return vertex
-            else:
-                return self.error
+        return self.error
 
     def represent(self):
-        pass
+        angle, counter = 360.0 / len(self), len(self) - 1
+        lenght = log((len(self)+1))*2
+        output = ""
+        for vertex in self._remove_vertex(self.error):
+            output += vertex.represent(
+                position="{angle}:{lenght}".format(
+                    angle=angle*counter,
+                    lenght=lenght)
+            )
+            counter -= 1
+        output += "\\path[->]\n"
+        for edge in self.edges:
+            output += edge.represent()
+        output += ";\n"
+        return output
 
     def transition_by_letter(self, current_vertex, letter):
         if len(letter) != 1:
@@ -77,36 +94,32 @@ class Automaton:
     def multiply_automaton(self, other, operator):
         if self.alphabet != other.alphabet:
             raise ValueError("Alphabets must match!")
-        vertices = set()
-        edges = set()
-        error_pattern_right = compile("\dError")
-        error_pattern_left = compile("Error\d")
-        for vertex_1 in self._remove_error():
-            for vertex_2 in other._remove_error():
+        vertices, edges = set(), set()
+        error_pat_right, error_pat_left = compile("\dError"), compile("Error\d")
+        for vertex_1 in self._remove_vertex(self.error):
+            for vertex_2 in other._remove_vertex(self.error):
                 for letter in self.alphabet:
                     new_vertex_1 = operator(vertex_1, vertex_2)
                     new_vertex_2 = operator(self.transition_by_letter(
                         vertex_1, letter),
                         other.transition_by_letter(vertex_2, letter))
 
-                    # TODO: Rewrite this in helpers.py
+                    # In cases of union the transition should behave like this.
                     if operator(False, True):
-                        if search(error_pattern_left, new_vertex_2.name):
+                        if search(error_pat_left, new_vertex_2.name):
                             new_vertex_2 = operator(
                                 vertex_1,
                                 other.transition_by_letter(vertex_2, letter))
 
-                        if search(error_pattern_right, new_vertex_2.name):
+                        if search(error_pat_right, new_vertex_2.name):
                             new_vertex_2 = operator(
                                 self.transition_by_letter(vertex_1, letter),
                                 vertex_2)
 
                     new_edge = Edge(new_vertex_1, new_vertex_2, letter)
-
                     edges.add(new_edge)
                     vertices.add(new_vertex_1)
                     vertices.add(new_vertex_2)
-
         return Automaton(vertices, edges, self.alphabet)
 
     def __and__(self, other):
@@ -118,3 +131,6 @@ class Automaton:
     # TODO: add subtraction to product.
     def __sub__(self, other):
         pass
+
+    def __len__(self):
+        return len(self.vertices) - 1

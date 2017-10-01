@@ -23,7 +23,16 @@ class Edge:
         return self._letter
 
     def represent(self):
-        pass
+        if self.start == self.end:
+            return "\t{start} edge [loop above] node {letter} ()\n".format(
+                start="(" + self.start.name + ")",
+                letter="{" + self.letter + "}"
+            )
+        return "\t{start} edge node {letter} {end}\n".format(
+            start="(" + self.start.name + ")",
+            letter="{" + self.letter + "}",
+            end="(" + self.end.name + ")"
+        )
 
     # We are beside ourselves.
     def __repr__(self):
