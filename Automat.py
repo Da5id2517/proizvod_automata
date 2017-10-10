@@ -1,5 +1,4 @@
 import operator
-from re import compile, search
 from math import log
 
 from Vertex import Vertex, initial
@@ -47,15 +46,24 @@ class Automaton:
                 return vertex
         return self.error
 
+    def initial(self):
+        return {vertex for vertex in self.vertices if vertex.initial}
+
+    # TODO: this isn't the whole thing.
+    def is_deterministic(self):
+        if len(self.initial()) > 1:
+            return False
+        return True
+
     def represent(self):
         angle, counter = 360.0 / len(self), len(self) - 1
-        lenght = log((len(self)+1))*2
+        length = log((len(self)+1))*2
         output = ""
         for vertex in self._remove_vertex(self.error):
             output += vertex.represent(
-                position="{angle}:{lenght}".format(
+                position="{angle}:{length}".format(
                     angle=angle*counter,
-                    lenght=lenght)
+                    length=length)
             )
             counter -= 1
         output += "\\path[->]\n"
@@ -95,27 +103,13 @@ class Automaton:
         if self.alphabet != other.alphabet:
             raise ValueError("Alphabets must match!")
         vertices, edges = set(), set()
-        error_pat_right, error_pat_left = compile("\dError"), compile("Error\d")
-        for vertex_1 in self._remove_vertex(self.error):
-            for vertex_2 in other._remove_vertex(self.error):
+        for vertex_1 in self.vertices:
+            for vertex_2 in other.vertices:
                 for letter in self.alphabet:
                     new_vertex_1 = operator(vertex_1, vertex_2)
                     new_vertex_2 = operator(self.transition_by_letter(
                         vertex_1, letter),
                         other.transition_by_letter(vertex_2, letter))
-
-                    # In cases of union the transition should behave like this.
-                    if operator(False, True):
-                        if search(error_pat_left, new_vertex_2.name):
-                            new_vertex_2 = operator(
-                                vertex_1,
-                                other.transition_by_letter(vertex_2, letter))
-
-                        if search(error_pat_right, new_vertex_2.name):
-                            new_vertex_2 = operator(
-                                self.transition_by_letter(vertex_1, letter),
-                                vertex_2)
-
                     new_edge = Edge(new_vertex_1, new_vertex_2, letter)
                     edges.add(new_edge)
                     vertices.add(new_vertex_1)

@@ -34,7 +34,6 @@ class Edge:
             end="(" + self.end.name + ")"
         )
 
-    # We are beside ourselves.
     def __repr__(self):
         return "{self.start} --> {self.letter} --> {self.end}".format(self=self)
 
